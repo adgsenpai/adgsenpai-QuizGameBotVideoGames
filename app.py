@@ -3,18 +3,16 @@ import streamlit as st
 
 import g4f
 
-from g4f.Provider import (
-    GptGo
-)
-
-st.title("🎮 Gaming Chatbot")
+st.title("🎮 Gaming Quiz Bot")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        {"role": "assistant", "content": "Welcome to the Gaming Chatbot!"}]
+        {"role": "assistant", "content": "Welcome to the Gaming Quiz Bot!"}
+    ]
 
     st.write(
-        'Ask me about video games! I can also recommend games to you. Try asking me "Mario Wonder Reviews" or "What is the best game?"'
+        '- This is quiz to humans about videos games. The bot will ask you questions about video games and you will have to answer them. \n'
+        '- Type `start` to start the quiz'
     )
 
     st.write(
@@ -30,36 +28,29 @@ if prompt := st.chat_input():
     if prompt == 'help':
         st.write(
             """
-            - Recommend me a game!
-            - What is the best game?
-            - Tell me more about [specific game title].
-            - What are the top-rated RPG games?
-            - Find me a game for Nintendo Switch.
-            - I like action-adventure games, what do you recommend?
-            - Show me user reviews for [game title].
-            - What's the latest news in the gaming industry?
-            - How can I start a career in game development?
-            - I'm having trouble running [game title], can you help?
+            - Start the quiz by writing `start`                        
             """
         )
     else:
         st.chat_message("user").write(prompt)
 
-        lastMessages = st.session_state.messages[-2:]
+        # get last 5 messages
+        lastMessages = st.session_state.messages[-3:]
 
         if len(lastMessages) == 0:
             lastMessages = [{"role": "user", "content": " "}]
 
+
         # Set with provider
         response = g4f.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            provider=g4f.Provider.GptGo,
+            model="gpt-3.5-turbo",            
             messages=[
-                {'role': 'system', 'content': 'You are a gamer.'},
-                {'role': 'system', 'content': 'Your job is to chat to people about video games. You can also recommend games to people.'},
+                {'role': 'system', 'content': 'You are a video game quiz bot. You are trying to quiz humans about video games.'},
+                {'role': 'system', 'content': 'When the user types start you will ask them a question about video games. The user will then answer the question. You will then tell them if they are correct or not and explain why they are correct give another question. If the user unsure about the question then explain the answer and give them the answer.'},                
             ] + lastMessages + [{"role": "user", "content": prompt}]
         )
         st.session_state.messages.append(
             {"role": "assistant", "content": response})
 
         st.chat_message("assistant").write(response)
+ 
